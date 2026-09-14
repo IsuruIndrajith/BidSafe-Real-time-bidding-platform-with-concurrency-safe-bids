@@ -1,35 +1,12 @@
-package bid.safe.lumio.BidSafe.model;
+package bid.safe.lumio.BidSafe.dto;
 
-import jakarta.persistence.*;
+public class RegisterRequest {
 
-@Entity
-public class User {
-
-    @Id
-    @GeneratedValue
-    private Long id;
-
-    @Column
     private String username;
-
-    @Column
     private String email;
-
-    @Column
     private String password;
 
-    @Column
-    private String role;
-
-    public User() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+    public RegisterRequest() {
     }
 
     public String getUsername() {
@@ -54,13 +31,5 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
     }
 }
