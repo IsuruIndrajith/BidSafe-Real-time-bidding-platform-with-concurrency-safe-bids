@@ -32,8 +32,61 @@ public class Auction {
 
         public Auction() {
         }
-
-
     // getters and setters
+    public Long getId() {
+            return id;
+    }
+
+        public void setId(Long id) {
+                this.id = id;
+        }
+
+        public Item getItem() {
+                return item;
+        }
+
+        public void setItem(Item item) {
+                this.item = item;
+        }
+
+        public LocalDateTime getStartTime() {
+                return startTime;
+        }
+
+        public void setStartTime(LocalDateTime startTime) {
+                this.startTime = startTime;
+        }
+
+        public LocalDateTime getEndTime() {
+                return endTime;
+        }
+
+        public void setEndTime(LocalDateTime endTime) {
+                this.endTime = endTime;
+        }
+
+        public String getStatus() {
+                return status;
+        }
+
+        public void setStatus(String status) {
+                this.status = status;
+        }
+
+        public double getCurrentHighestBid() {
+                return currentHighestBid;
+        }
+
+        public void setCurrentHighestBid(double currentHighestBid) {
+                this.currentHighestBid = currentHighestBid;
+        }
+
+        public List<Bid> getBids() {
+                return bids;
+        }
+
+        public void setBids(List<Bid> bids) {
+                this.bids = bids;
+        }
     }
 
