@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BidSafe WebSocket Test</title>
+</head>
+<body>
+
+<h2>BidSafe WebSocket Test</h2>
+
+<label>
+    Auction ID:
+    <input id="auctionId" type="number" value="1" min="1">
+</label>
+<label>
+    JWT:
+    <input id="token" type="password" placeholder="Paste login token">
+</label>
+<button onclick="connect()">Connect</button>
+
+<br><br>
+
+<label>
+    Bid amount:
+    <input id="amount" type="number" step="0.01" min="0.01">
+</label>
+<button onclick="placeBid()">Place Bid</button>
+
+<p id="status">Disconnected</p>
+
+<div id="messages"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.2.0/bundles/stomp.umd.min.js"></script>
+
+<script>
+
+    const API_BASE_URL = 'http://localhost:8080';
+    let client;
+    let subscription;
+
+    function connect() {
+
+        const auctionId = document.getElementById("auctionId").value;
+
+        if (!auctionId) {
+            setStatus("Enter an auction ID");
+            return;
+        }
+
+        if (client) {
+            client.deactivate();
+        }
+
+        client = new StompJs.Client({
+            brokerURL: 'ws://localhost:8080/ws'
+        });
+
+        client.onConnect = function () {
+
+            console.log("Connected to WebSocket");
+
+            subscription = client.subscribe(
+                '/topic/auctions/' + auctionId,
+                function (message) {
+                    const update = JSON.parse(message.body);
+
+                    console.log("Received bid:", update);
+
+                    const entry = document.createElement("p");
+                    entry.textContent =
+                        update.username + " bid " + update.amount +
+                        " on auction " + update.auctionId;
+                    document.getElementById("messages").appendChild(entry);
+                    setStatus("Bid update received");
+                }
+            );
+
+            setStatus("Connected and subscribed to /topic/auctions/" + auctionId);
+        };
+
+        client.onWebSocketError = function (error) {
+            console.error("WebSocket error:", error);
+            setStatus("WebSocket connection error");
+        };
+
+        client.onStompError = function (frame) {
+            console.error("STOMP error:", frame);
+            setStatus("STOMP error: " + frame.headers.message);
+        };
+
+        client.onDisconnect = function () {
+            setStatus("WebSocket disconnected");
+        };
+
+        client.activate();
+    }
+
+    async function placeBid() {
+
+        const auctionId = document.getElementById("auctionId").value;
+        const amount = document.getElementById("amount").value;
+        const token = document.getElementById("token").value;
+
+        if (!auctionId || !amount || !token) {
+            setStatus("Auction ID, bid amount, and JWT are required");
+            return;
+        }
+
+        if (!client || !client.connected || !subscription) {
+            setStatus("Connect to the auction topic before placing a bid");
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                API_BASE_URL + '/api/auctions/' + auctionId + '/bids',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ amount: Number(amount) })
+                }
+            );
+
+            if (!response.ok) {
+                setStatus("Bid failed: HTTP " + response.status);
+                return;
+            }
+
+            setStatus("Bid accepted; waiting for WebSocket delivery");
+        } catch (error) {
+            console.error("Bid request failed:", error);
+            setStatus("Bid request failed; check that the API is running");
+        }
+    }
+
+    function setStatus(message) {
+        document.getElementById("status").innerText = message;
+    }
+
+    window.addEventListener("beforeunload", function () {
+        if (client) {
+            client.deactivate();
+        }
+    });
+
+</script>
+
+</body>
+</html>

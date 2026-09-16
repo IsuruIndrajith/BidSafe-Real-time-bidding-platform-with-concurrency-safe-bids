@@ -1,6 +1,7 @@
 package bid.safe.lumio.BidSafe.service;
 
 import bid.safe.lumio.BidSafe.dto.BidRequest;
+import bid.safe.lumio.BidSafe.dto.BidUpdate;
 import bid.safe.lumio.BidSafe.model.Auction;
 import bid.safe.lumio.BidSafe.model.Bid;
 import bid.safe.lumio.BidSafe.model.User;
@@ -8,6 +9,7 @@ import bid.safe.lumio.BidSafe.repository.AuctionRepository;
 import bid.safe.lumio.BidSafe.repository.BidRepository;
 import bid.safe.lumio.BidSafe.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.time.LocalDateTime;
 
@@ -17,15 +19,18 @@ public class BidService {
     private final BidRepository bidRepository;
     private final AuctionRepository auctionRepository;
     private final UserRepository userRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     public BidService(
             BidRepository bidRepository,
             AuctionRepository auctionRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            SimpMessagingTemplate messagingTemplate) {
 
         this.bidRepository = bidRepository;
         this.auctionRepository = auctionRepository;
         this.userRepository = userRepository;
+        this.messagingTemplate = messagingTemplate;
     }
 
     public Bid placeBid(
@@ -46,11 +51,44 @@ public class BidService {
         // 3. Read current highest bid
         double currentHighest = auction.getCurrentHighestBid();
 
-        // 4. Compare new bid with current highest
+//        // 4. Compare new bid with current highest
+//        if (request.getAmount() <= currentHighest) {
+//            throw new RuntimeException(
+//                    "Bid must be higher than current highest bid");
+//        }
+
+//        double currentHighest = auction.getCurrentHighestBid();
+
+        System.out.println(
+                "THREAD " + Thread.currentThread().getName()
+                        + " READ highest = " + currentHighest
+                        + " | trying bid = " + request.getAmount()
+        );
+
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
         if (request.getAmount() <= currentHighest) {
+
+            System.out.println(
+                    "THREAD " + Thread.currentThread().getName()
+                            + " REJECTED bid = " + request.getAmount()
+                            + " | read highest = " + currentHighest
+            );
+
             throw new RuntimeException(
                     "Bid must be higher than current highest bid");
         }
+
+        System.out.println(
+                "THREAD " + Thread.currentThread().getName()
+                        + " PASSED check"
+                        + " | bid = " + request.getAmount()
+                        + " | read highest = " + currentHighest
+        );
 
         // 5. Create bid
         Bid bid = new Bid();
@@ -68,6 +106,19 @@ public class BidService {
 
         // 8. Save auction
         auctionRepository.save(auction);
+
+        // Create WebSocket update
+        BidUpdate update = new BidUpdate(
+                auction.getId(),
+                user.getUsername(),
+                request.getAmount()
+        );
+
+        // Broadcast update
+        messagingTemplate.convertAndSend(
+                "/topic/auctions/" + auctionId,
+                update
+        );
 
         return savedBid;
     }
