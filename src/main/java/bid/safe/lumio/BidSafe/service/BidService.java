@@ -51,11 +51,44 @@ public class BidService {
         // 3. Read current highest bid
         double currentHighest = auction.getCurrentHighestBid();
 
-        // 4. Compare new bid with current highest
+//        // 4. Compare new bid with current highest
+//        if (request.getAmount() <= currentHighest) {
+//            throw new RuntimeException(
+//                    "Bid must be higher than current highest bid");
+//        }
+
+//        double currentHighest = auction.getCurrentHighestBid();
+
+        System.out.println(
+                "THREAD " + Thread.currentThread().getName()
+                        + " READ highest = " + currentHighest
+                        + " | trying bid = " + request.getAmount()
+        );
+
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
         if (request.getAmount() <= currentHighest) {
+
+            System.out.println(
+                    "THREAD " + Thread.currentThread().getName()
+                            + " REJECTED bid = " + request.getAmount()
+                            + " | read highest = " + currentHighest
+            );
+
             throw new RuntimeException(
                     "Bid must be higher than current highest bid");
         }
+
+        System.out.println(
+                "THREAD " + Thread.currentThread().getName()
+                        + " PASSED check"
+                        + " | bid = " + request.getAmount()
+                        + " | read highest = " + currentHighest
+        );
 
         // 5. Create bid
         Bid bid = new Bid();
