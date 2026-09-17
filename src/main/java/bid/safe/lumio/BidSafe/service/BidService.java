@@ -40,9 +40,13 @@ public class BidService {
             String email) {
 
         // 1. Find auction
-        Auction auction = auctionRepository.findById(auctionId)
-                .orElseThrow(() ->
-                        new RuntimeException("Auction not found"));
+        Auction auction = auctionRepository.findByIdForUpdate(auctionId)
+                .orElseThrow(() -> new RuntimeException("Auction not found"));
+
+        System.out.println(
+                "THREAD " + Thread.currentThread().getName()
+                        + " ACQUIRED LOCK"
+        );
 
         // 2. Find user
         User user = userRepository.findByEmail(email)
