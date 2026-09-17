@@ -30,6 +30,9 @@ public class Auction {
         @OneToMany
         private List<Bid> bids;
 
+        @Version
+        private Long version;
+
         public Auction() {
         }
     // getters and setters
@@ -88,5 +91,13 @@ public class Auction {
         public void setBids(List<Bid> bids) {
                 this.bids = bids;
         }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
     }
 

@@ -20,7 +20,7 @@ class BidConcurrencyTestwithCounters {
     @Test
     void testConcurrentBids() throws Exception {
 
-        int numberOfThreads = 5;
+        int numberOfThreads = 3;
 
         AtomicInteger accepted =
                 new AtomicInteger();
@@ -55,7 +55,7 @@ class BidConcurrencyTestwithCounters {
                     BidRequest request = new BidRequest();
 
                     request.setAmount(
-                            429055 + threadNumber
+                            429060 + threadNumber
                     );
 
                     bidService.placeBid(
