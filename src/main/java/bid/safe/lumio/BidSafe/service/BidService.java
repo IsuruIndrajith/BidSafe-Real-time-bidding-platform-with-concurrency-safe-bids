@@ -10,7 +10,7 @@ import bid.safe.lumio.BidSafe.repository.BidRepository;
 import bid.safe.lumio.BidSafe.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 
 @Service
@@ -33,6 +33,7 @@ public class BidService {
         this.messagingTemplate = messagingTemplate;
     }
 
+    @Transactional
     public Bid placeBid(
             Long auctionId,
             BidRequest request,
