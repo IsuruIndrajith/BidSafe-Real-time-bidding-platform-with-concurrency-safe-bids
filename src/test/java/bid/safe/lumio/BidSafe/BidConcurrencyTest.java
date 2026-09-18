@@ -68,7 +68,8 @@ class BidConcurrencyTest {
                     bidService.placeBid(
                             auctionId,
                             request,
-                            "isuru@gmail.com"
+                            "isuru@gmail.com",
+                            "bid-concurrency-" + threadNumber + "-" + System.nanoTime()
                     );
 
                 } catch (Exception e) {

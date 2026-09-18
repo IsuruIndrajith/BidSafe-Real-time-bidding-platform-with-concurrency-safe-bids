@@ -61,7 +61,8 @@ class BidConcurrencyTestwithCounters {
                     bidService.placeBid(
                             1L,
                             request,
-                            "isuru@gmail.com"
+                            "isuru@gmail.com",
+                            "bid-counter-" + threadNumber + "-" + System.nanoTime()
                     );
 
                     accepted.incrementAndGet();
