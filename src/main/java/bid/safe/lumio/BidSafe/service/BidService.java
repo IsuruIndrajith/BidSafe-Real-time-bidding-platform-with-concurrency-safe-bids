@@ -2,6 +2,7 @@ package bid.safe.lumio.BidSafe.service;
 
 import bid.safe.lumio.BidSafe.dto.BidRequest;
 import bid.safe.lumio.BidSafe.dto.BidUpdate;
+import bid.safe.lumio.BidSafe.exception.ResourceNotFoundException;
 import bid.safe.lumio.BidSafe.model.Auction;
 import bid.safe.lumio.BidSafe.model.Bid;
 import bid.safe.lumio.BidSafe.model.IdempotencyRecord;
@@ -62,7 +63,7 @@ public class BidService {
 
         // 1. Find auction
         Auction auction = auctionRepository.findByIdForUpdate(auctionId)
-                .orElseThrow(() -> new RuntimeException("Auction not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Auction not found"));
 
         System.out.println(
                 "THREAD " + Thread.currentThread().getName()
