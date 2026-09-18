@@ -5,6 +5,8 @@ import bid.safe.lumio.BidSafe.model.Auction;
 import bid.safe.lumio.BidSafe.model.Item;
 import bid.safe.lumio.BidSafe.repository.AuctionRepository;
 import bid.safe.lumio.BidSafe.repository.ItemRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,6 +16,8 @@ public class AuctionService {
 
     private final AuctionRepository auctionRepository;
     private final ItemRepository itemRepository;
+    private static final Logger log =
+            LoggerFactory.getLogger(AuctionService.class);
 
     public AuctionService(
             AuctionRepository auctionRepository,
@@ -35,6 +39,14 @@ public class AuctionService {
         auction.setEndTime(request.getEndTime());
         auction.setStatus("UPCOMING");
         auction.setCurrentHighestBid(item.getStartingPrice());
+
+        Auction savedAuction = auctionRepository.save(auction);
+
+        log.info(
+                "AUCTION_CREATED auctionId={} itemId={}",
+                savedAuction.getId(),
+                item.getId()
+        );
 
         return auctionRepository.save(auction);
     }

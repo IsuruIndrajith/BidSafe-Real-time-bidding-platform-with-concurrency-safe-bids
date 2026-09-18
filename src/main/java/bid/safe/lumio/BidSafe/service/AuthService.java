@@ -5,6 +5,8 @@ import bid.safe.lumio.BidSafe.dto.RegisterRequest;
 import bid.safe.lumio.BidSafe.model.User;
 import bid.safe.lumio.BidSafe.repository.UserRepository;
 import bid.safe.lumio.BidSafe.security.JwtService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,6 +19,8 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private static final Logger log =
+            LoggerFactory.getLogger(AuthService.class);
 
     public AuthService(
             UserRepository userRepository,
@@ -41,6 +45,14 @@ public class AuthService {
         );
         user.setRole("USER");
 
+        User savedUser = userRepository.save(user);
+
+        log.info(
+                "USER_REGISTERED userId={} email={}",
+                savedUser.getId(),
+                savedUser.getEmail()
+        );
+
         return userRepository.save(user);
     }
 
@@ -51,6 +63,10 @@ public class AuthService {
                         request.getEmail(),
                         request.getPassword()
                 )
+        );
+        log.info(
+                "USER_LOGIN email={}",
+                request.getEmail()
         );
 
         return jwtService.generateToken(request.getEmail());

@@ -11,6 +11,8 @@ import bid.safe.lumio.BidSafe.repository.AuctionRepository;
 import bid.safe.lumio.BidSafe.repository.BidRepository;
 import bid.safe.lumio.BidSafe.repository.IdempotencyRecordRepository;
 import bid.safe.lumio.BidSafe.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +21,9 @@ import java.util.Optional;
 
 @Service
 public class BidService {
+
+    private static final Logger log =
+            LoggerFactory.getLogger(BidService.class);
 
     private final BidRepository bidRepository;
     private final AuctionRepository auctionRepository;
@@ -45,6 +50,13 @@ public class BidService {
             BidRequest request,
             String email,
             String idempotencyKey) {
+
+        log.info(
+                "BID_RECEIVED auctionId={} user={} amount={}",
+                auctionId,
+                email,
+                request.getAmount()
+        );
 
         Optional<IdempotencyRecord> existing =
                 idempotencyRecordRepository
@@ -86,10 +98,12 @@ public class BidService {
 
 //        double currentHighest = auction.getCurrentHighestBid();
 
-        System.out.println(
-                "THREAD " + Thread.currentThread().getName()
-                        + " READ highest = " + currentHighest
-                        + " | trying bid = " + request.getAmount()
+        log.debug(
+                "BID_CHECK auctionId={} thread={} currentHighest={} bidAmount={}",
+                auctionId,
+                Thread.currentThread().getName(),
+                currentHighest,
+                request.getAmount()
         );
 
         try {
@@ -100,14 +114,17 @@ public class BidService {
 
         if (request.getAmount() <= currentHighest) {
 
-            System.out.println(
-                    "THREAD " + Thread.currentThread().getName()
-                            + " REJECTED bid = " + request.getAmount()
-                            + " | read highest = " + currentHighest
+            log.warn(
+                    "BID_REJECTED auctionId={} user={} amount={} currentHighest={}",
+                    auctionId,
+                    email,
+                    request.getAmount(),
+                    currentHighest
             );
 
             throw new RuntimeException(
-                    "Bid must be higher than current highest bid");
+                    "Bid must be higher than current highest bid"
+            );
         }
 
         System.out.println(
@@ -133,6 +150,14 @@ public class BidService {
 
         // 8. Save auction
         auctionRepository.save(auction);
+
+        log.info(
+                "BID_ACCEPTED auctionId={} bidId={} user={} amount={}",
+                auctionId,
+                savedBid.getId(),
+                email,
+                request.getAmount()
+        );
 
         IdempotencyRecord record =
                 new IdempotencyRecord();
