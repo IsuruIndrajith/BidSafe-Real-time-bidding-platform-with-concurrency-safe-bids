@@ -82,7 +82,7 @@ class PessimisticLockingTest {
                 BidRequest request = new BidRequest();
                 request.setAmount(250);
                 System.out.println("THREAD A: sending bid 250");
-                bidService.placeBid(auctionId, request, userA.getEmail());
+                bidService.placeBid(auctionId, request, userA.getEmail(), "bid-a-" + System.nanoTime());
                 System.out.println("THREAD A: bid 250 accepted");
                 return "A ACCEPTED";
             } catch (Exception e) {
@@ -98,7 +98,7 @@ class PessimisticLockingTest {
                 BidRequest request = new BidRequest();
                 request.setAmount(220);
                 System.out.println("THREAD B: sending bid 220");
-                bidService.placeBid(auctionId, request, userB.getEmail());
+                bidService.placeBid(auctionId, request, userB.getEmail(), "bid-b-" + System.nanoTime());
                 System.out.println("THREAD B: bid 220 accepted");
                 return "B ACCEPTED";
             } catch (Exception e) {

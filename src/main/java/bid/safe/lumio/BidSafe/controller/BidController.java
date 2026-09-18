@@ -20,6 +20,7 @@ public class BidController {
     public Bid placeBid(
             @PathVariable Long auctionId,
             @RequestBody BidRequest request,
+            @RequestHeader("Idempotency-Key") String idempotencyKey,
             Authentication authentication) {
 
         String email = authentication.getName();
@@ -27,7 +28,8 @@ public class BidController {
         return bidService.placeBid(
                 auctionId,
                 request,
-                email
+                email,
+                idempotencyKey
         );
     }
 }
