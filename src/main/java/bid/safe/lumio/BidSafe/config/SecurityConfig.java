@@ -62,7 +62,9 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/auth/register",
                                 "/auth/login",
-                                "/ws/**"
+                                "/ws/**",
+                                "/actuator/**"
+//                                "/actuator/prometheus"
                         ).permitAll()
 
                         .anyRequest().authenticated()
