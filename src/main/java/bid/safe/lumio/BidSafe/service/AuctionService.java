@@ -1,6 +1,7 @@
 package bid.safe.lumio.BidSafe.service;
 
 import bid.safe.lumio.BidSafe.dto.AuctionRequest;
+import bid.safe.lumio.BidSafe.metrics.BidSafeMetrics;
 import bid.safe.lumio.BidSafe.model.Auction;
 import bid.safe.lumio.BidSafe.model.Item;
 import bid.safe.lumio.BidSafe.repository.AuctionRepository;
@@ -16,15 +17,18 @@ public class AuctionService {
 
     private final AuctionRepository auctionRepository;
     private final ItemRepository itemRepository;
+    private final BidSafeMetrics bidSafeMetrics;
     private static final Logger log =
             LoggerFactory.getLogger(AuctionService.class);
 
     public AuctionService(
             AuctionRepository auctionRepository,
-            ItemRepository itemRepository) {
+            ItemRepository itemRepository,
+            BidSafeMetrics bidSafeMetrics) {
 
         this.auctionRepository = auctionRepository;
         this.itemRepository = itemRepository;
+        this.bidSafeMetrics = bidSafeMetrics;
     }
 
     public Auction createAuction(AuctionRequest request) {
@@ -47,8 +51,8 @@ public class AuctionService {
                 savedAuction.getId(),
                 item.getId()
         );
-
-        return auctionRepository.save(auction);
+        bidSafeMetrics.incrementAuctionsCreated();
+        return savedAuction;
     }
 
     public List<Auction> getAllAuctions() {

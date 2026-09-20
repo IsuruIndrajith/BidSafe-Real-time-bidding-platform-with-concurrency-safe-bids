@@ -3,6 +3,7 @@ package bid.safe.lumio.BidSafe.service;
 import bid.safe.lumio.BidSafe.dto.BidRequest;
 import bid.safe.lumio.BidSafe.dto.BidUpdate;
 import bid.safe.lumio.BidSafe.exception.ResourceNotFoundException;
+import bid.safe.lumio.BidSafe.metrics.BidSafeMetrics;
 import bid.safe.lumio.BidSafe.model.Auction;
 import bid.safe.lumio.BidSafe.model.Bid;
 import bid.safe.lumio.BidSafe.model.IdempotencyRecord;
@@ -29,12 +30,14 @@ public class BidService {
     private final AuctionRepository auctionRepository;
     private final UserRepository userRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final BidSafeMetrics bidSafeMetrics;
     private final IdempotencyRecordRepository idempotencyRecordRepository;
 
     public BidService(
             BidRepository bidRepository,
             AuctionRepository auctionRepository,
             UserRepository userRepository,
+            BidSafeMetrics bidSafeMetrics,
             SimpMessagingTemplate messagingTemplate, IdempotencyRecordRepository idempotencyRecordRepository) {
 
         this.bidRepository = bidRepository;
@@ -42,6 +45,7 @@ public class BidService {
         this.userRepository = userRepository;
         this.messagingTemplate = messagingTemplate;
         this.idempotencyRecordRepository = idempotencyRecordRepository;
+        this.bidSafeMetrics = bidSafeMetrics;
     }
 
     @Transactional
@@ -57,6 +61,7 @@ public class BidService {
                 email,
                 request.getAmount()
         );
+        bidSafeMetrics.incrementBidsReceived();
 
         Optional<IdempotencyRecord> existing =
                 idempotencyRecordRepository
@@ -121,6 +126,7 @@ public class BidService {
                     request.getAmount(),
                     currentHighest
             );
+            bidSafeMetrics.incrementBidsRejected();
 
             throw new RuntimeException(
                     "Bid must be higher than current highest bid"
@@ -158,6 +164,7 @@ public class BidService {
                 email,
                 request.getAmount()
         );
+        bidSafeMetrics.incrementBidsAccepted();
 
         IdempotencyRecord record =
                 new IdempotencyRecord();

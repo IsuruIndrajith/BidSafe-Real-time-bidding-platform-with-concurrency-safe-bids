@@ -1,6 +1,8 @@
 package bid.safe.lumio.BidSafe;
 
+import bid.safe.lumio.BidSafe.metrics.BidSafeMetrics;
 import bid.safe.lumio.BidSafe.service.RedisLockService;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,7 +34,7 @@ class RedisLockIntegrationTest {
         connectionFactory.afterPropertiesSet();
 
         redisTemplate = new StringRedisTemplate(connectionFactory);
-        redisLockService = new RedisLockService(redisTemplate);
+        redisLockService = new RedisLockService(redisTemplate, new BidSafeMetrics(new SimpleMeterRegistry()));
 
         redisTemplate.delete("auction:lock:integration-test");
         redisTemplate.delete("auction:lock:owner-check");

@@ -1,5 +1,6 @@
 package bid.safe.lumio.BidSafe.service;
 
+import bid.safe.lumio.BidSafe.metrics.BidSafeMetrics;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
@@ -19,14 +20,27 @@ public class RedisLockService {
             );
 
     private final StringRedisTemplate redisTemplate;
+    private final BidSafeMetrics bidSafeMetrics;
 
-    public RedisLockService(StringRedisTemplate redisTemplate) {
+    public RedisLockService(StringRedisTemplate redisTemplate, BidSafeMetrics bidSafeMetrics) {
         this.redisTemplate = redisTemplate;
+        this.bidSafeMetrics = bidSafeMetrics;
     }
 
     public boolean tryLock(String lockKey, String lockValue, Duration expiration) {
-        Boolean acquired = redisTemplate.opsForValue().setIfAbsent(lockKey, lockValue, expiration);
-        return Boolean.TRUE.equals(acquired);
+        try {
+            Boolean acquired = redisTemplate.opsForValue().setIfAbsent(lockKey, lockValue, expiration);
+            if (Boolean.TRUE.equals(acquired)) {
+                bidSafeMetrics.incrementRedisLocksAcquired();
+                return true;
+            }
+
+            bidSafeMetrics.incrementRedisLocksFailed();
+            return false;
+        } catch (Exception ex) {
+            bidSafeMetrics.incrementRedisLocksFailed();
+            throw ex;
+        }
     }
 
     public boolean unlock(String lockKey, String lockValue) {
