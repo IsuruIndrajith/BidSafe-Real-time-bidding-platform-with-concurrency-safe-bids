@@ -12,7 +12,7 @@
 [![Prometheus](https://img.shields.io/badge/Prometheus-Monitoring-E6522C?style=for-the-badge&logo=prometheus&logoColor=white)](https://prometheus.io/)
 [![Grafana](https://img.shields.io/badge/Grafana-Dashboards-F46800?style=for-the-badge&logo=grafana&logoColor=white)](https://grafana.com/)
 
-> **Production-ready auction platform engineered to handle high-throughput concurrent bidding** — demonstrating race condition detection, optimistic & pessimistic locking, distributed Redis locks, idempotency, WebSocket real-time updates, rate limiting, and full observability through Prometheus + Grafana.
+> **Production-ready auction platform engineered to handle high-throughput concurrent bidding**   demonstrating race condition detection, optimistic & pessimistic locking, distributed Redis locks, idempotency, WebSocket real-time updates, rate limiting, and full observability through Prometheus + Grafana.
 
 </div>
 
@@ -20,7 +20,7 @@
 
 ## 📌 Why BidSafe?
 
-In every real-world high-stakes auction — whether it is eBay, stock trading platforms, or government e-procurement systems — **dozens of users can submit bids simultaneously in the final seconds**. Without proper concurrency control, multiple bids can read the same "current highest bid," all pass validation, and corrupt the auction state — a classic **race condition**.
+In every real-world high-stakes auction whether it is eBay, stock trading platforms, or government e-procurement systems, **dozens of users can submit bids simultaneously in the final seconds**. Without proper concurrency control, multiple bids can read the same "current highest bid," all pass validation, and corrupt the auction state a classic **race condition**.
 
 BidSafe is engineered to **demonstrate, reproduce, and solve** this problem using the same battle-tested strategies employed in enterprise Java backends:
 
@@ -38,17 +38,17 @@ BidSafe is engineered to **demonstrate, reproduce, and solve** this problem usin
 
 ## ✨ Key Features
 
-- 🔐 **JWT-secured REST API** — stateless authentication with role-based access
-- ⚡ **WebSocket / STOMP** — real-time bid broadcasting to all connected clients
-- 🔒 **Pessimistic Locking** — `SELECT FOR UPDATE` ensures only one thread updates the auction at a time
-- 🧮 **Optimistic Locking** — `@Version` field detects concurrent updates without blocking reads
-- 🗝️ **Redis Distributed Lock** — Lua-script-based atomic acquire/release for cross-instance safety
-- 🔁 **Idempotency** — identical bid requests (same `Idempotency-Key` header) are deduplicated safely
-- 🚦 **Rate Limiting** — per-user token bucket (4 requests per 4 seconds) via Bucket4j
-- 📊 **Custom Metrics** — `bids.received`, `bids.accepted`, `bids.rejected`, `redis.locks.acquired` exposed via Micrometer
-- 📈 **Prometheus + Grafana** — full observability stack with custom dashboards
-- 🐳 **Docker-ready** — single-command spin-up with Docker Compose
-- 🏥 **Spring Actuator** — health, readiness, JVM, and HTTP request metrics
+- 🔐 **JWT-secured REST API** -> stateless authentication with role-based access
+- ⚡ **WebSocket / STOMP** ->  real-time bid broadcasting to all connected clients
+- 🔒 **Pessimistic Locking**  -> `SELECT FOR UPDATE` ensures only one thread updates the auction at a time
+- 🧮 **Optimistic Locking** ->  `@Version` field detects concurrent updates without blocking reads
+- 🗝️ **Redis Distributed Lock** ->  Lua-script-based atomic acquire/release for cross-instance safety
+- 🔁 **Idempotency** -> identical bid requests (same `Idempotency-Key` header) are deduplicated safely
+- 🚦 **Rate Limiting** -> per-user token bucket (4 requests per 4 seconds) via Bucket4j
+- 📊 **Custom Metrics** ->  `bids.received`, `bids.accepted`, `bids.rejected`, `redis.locks.acquired` exposed via Micrometer
+- 📈 **Prometheus + Grafana** ->  full observability stack with custom dashboards
+- 🐳 **Docker-ready** ->  single-command spin-up with Docker Compose
+- 🏥 **Spring Actuator** ->  health, readiness, JVM, and HTTP request metrics
 
 ---
 
@@ -87,7 +87,7 @@ BidSafe is engineered to **demonstrate, reproduce, and solve** this problem usin
 
 ## 🚀 Getting Started
 
-### Option 1 — Docker Hub (Recommended, Zero Config)
+### Option 1   Docker Hub (Recommended, Zero Config)
 
 The pre-built image is published on Docker Hub. This is the fastest way to run BidSafe.
 
@@ -175,7 +175,7 @@ curl http://localhost:8080/actuator/health
 
 ---
 
-### Option 2 — Clone & Build from Source
+### Option 2   Clone & Build from Source
 
 **Prerequisites**
 - Java 17+
@@ -264,11 +264,11 @@ curl -X POST http://localhost:8080/api/auctions/1/bids \
 
 ---
 
-## 🧠 Technical Deep Dive — Concurrency Strategies
+## 🧠 Technical Deep Dive   Concurrency Strategies
 
 ### 1. The Race Condition Problem
 
-Without locking, concurrent threads can both read `currentHighestBid = 1000`, both pass the "bid must be higher" check, and both write — corrupting the auction state.
+Without locking, concurrent threads can both read `currentHighestBid = 1000`, both pass the "bid must be higher" check, and both write   corrupting the auction state.
 
 ```
 Thread A reads  highest = 1000  ─┐
@@ -311,7 +311,7 @@ Optional<Auction> findByIdForUpdate(@Param("id") Long id);
 <img width="1135" height="673" alt="21 Pessimistic locking test" src="https://github.com/user-attachments/assets/47e967e6-1215-48b6-b30d-76d896030268" />
 
 
-*After enabling pessimistic locking — only the winning bid is accepted; all others are cleanly rejected*
+*After enabling pessimistic locking   only the winning bid is accepted; all others are cleanly rejected*
 <img width="957" height="602" alt="10  placed concurrency bids through a test and got accepted and rejected numbers" src="https://github.com/user-attachments/assets/46cb3be1-41f7-4cfc-969c-a0e62718789f" />
 
 
@@ -334,7 +334,7 @@ private Long version;
 <img width="381" height="90" alt="14  setup versions in auction model" src="https://github.com/user-attachments/assets/1b039c25-4eb9-4307-b189-48edd365c74f" />
 
 
-*The race window narrows — stale-version writes are now detected before they corrupt data*
+*The race window narrows   stale-version writes are now detected before they corrupt data*
 <img width="1427" height="587" alt="15 race window after the versions " src="https://github.com/user-attachments/assets/30aa35d7-4373-4617-92f2-e0239d56c33b" />
 
 
@@ -346,7 +346,7 @@ private Long version;
 <img width="446" height="277" alt="18 new version after the update" src="https://github.com/user-attachments/assets/8b85686f-3c34-41d4-a4e3-7d54798d91dc" />
 
 
-*Exception handler returning a structured 409 Conflict response to the client*
+*Version update after a bid is made*
 <img width="1417" height="732" alt="19 OptimisticLocking exception handled" src="https://github.com/user-attachments/assets/402d07c2-245c-450d-9ab2-bc6bd7a69d3f" />
 
 
@@ -368,7 +368,7 @@ redisTemplate.opsForValue().setIfAbsent(lockKey, lockValue, expiration);
 <img width="798" height="636" alt="redis lock integration test" src="https://github.com/user-attachments/assets/1e75d1ea-2930-4d0b-a41c-02073f906a68" />
 
 
-*The Lua script prevents any thread other than the lock owner from releasing it — a critical safety guarantee*
+*The Lua script prevents any thread other than the lock owner from releasing it   a critical safety guarantee*
 <img width="1300" height="736" alt="Redis lock is not released by a random thread" src="https://github.com/user-attachments/assets/987fa6a9-d8d4-4191-8900-ec7f8539bbec" />
 
 
@@ -376,13 +376,13 @@ redisTemplate.opsForValue().setIfAbsent(lockKey, lockValue, expiration);
 
 ### 5. Idempotency
 
-Every bid request requires a client-supplied `Idempotency-Key` header. The server stores a mapping of `key → bidId`. A duplicate request returns the original response without re-processing — essential for network retry safety.
+Every bid request requires a client-supplied `Idempotency-Key` header. The server stores a mapping of `key → bidId`. A duplicate request returns the original response without re-processing   essential for network retry safety.
 
 *Two identical POST requests sent with the same `Idempotency-Key` header*
 <img width="1046" height="707" alt="22  idempotency key for the same request sent twice" src="https://github.com/user-attachments/assets/46e1b9b2-63f4-4cbf-b4e8-567435e574ca" />
 
 
-*The server returns the cached result — the bid is NOT processed twice*
+*The server returns the cached result   the bid is NOT processed twice*
 <img width="412" height="238" alt="23  The request has sent twice, but for the same idempotency the same is not happening twice" src="https://github.com/user-attachments/assets/7136c484-23c7-419b-86e1-00e6b27e9f6e" />
 
 
@@ -489,7 +489,7 @@ curl -X POST http://localhost:8080/api/auctions/1/bids \
 
 ### Rate Limiting
 ```bash
-# Send 20 rapid requests — only 4 per 4 seconds are allowed per user
+# Send 20 rapid requests   only 4 per 4 seconds are allowed per user
 for i in {1..20}; do
   curl -X POST http://localhost:8080/api/auctions/1/bids \
     -H "Authorization: Bearer <token>" \
@@ -513,9 +513,9 @@ docker compose up -d
 
 | Service | URL | Credentials |
 |---------|-----|-------------|
-| Spring Actuator | `http://localhost:8080/actuator` | — |
-| Prometheus metrics endpoint | `http://localhost:8080/actuator/prometheus` | — |
-| Prometheus UI | `http://localhost:9090` | — |
+| Spring Actuator | `http://localhost:8080/actuator` |   |
+| Prometheus metrics endpoint | `http://localhost:8080/actuator/prometheus` |   |
+| Prometheus UI | `http://localhost:9090` |   |
 | Grafana Dashboard | `http://localhost:3000` | `admin / admin` |
 
 ### Actuator Health & JVM Metrics
@@ -619,19 +619,19 @@ rate(http_server_requests_seconds_count[1m])
 |---|---|---|
 | **Java** | 17 (LTS) | Primary language |
 | **Spring Boot** | 4.1.1 | Application framework |
-| **Spring MVC** | — | REST API layer |
-| **Spring Data JPA** | — | ORM & repository layer |
-| **Spring Security** | — | Authentication & Authorization |
-| **Spring WebSocket** | — | Real-time STOMP messaging |
-| **Spring Actuator** | — | Production health & metrics endpoints |
-| **Hibernate** | — | JPA provider, Optimistic/Pessimistic locking |
-| **Lombok** | — | Boilerplate reduction |
+| **Spring MVC** |   | REST API layer |
+| **Spring Data JPA** |   | ORM & repository layer |
+| **Spring Security** |   | Authentication & Authorization |
+| **Spring WebSocket** |   | Real-time STOMP messaging |
+| **Spring Actuator** |   | Production health & metrics endpoints |
+| **Hibernate** |   | JPA provider, Optimistic/Pessimistic locking |
+| **Lombok** |   | Boilerplate reduction |
 
 ### Concurrency & Distributed Systems
 
 | Technology | Role |
 |---|---|
-| **MySQL Pessimistic Locking** | `SELECT FOR UPDATE` — serializes concurrent bid transactions at DB level |
+| **MySQL Pessimistic Locking** | `SELECT FOR UPDATE`   serializes concurrent bid transactions at DB level |
 | **JPA `@Version` / Optimistic Locking** | Detects stale writes without blocking reads |
 | **Redis (Spring Data Redis)** | Distributed lock via atomic `SET NX PX` + Lua script for safe release |
 | **Bucket4j** | Token-bucket rate limiting per user (4 req / 4 sec) |
@@ -650,7 +650,7 @@ rate(http_server_requests_seconds_count[1m])
 
 | Technology | Role |
 |---|---|
-| **Micrometer** | Metrics facade — custom counters for bids, locks, auctions |
+| **Micrometer** | Metrics facade   custom counters for bids, locks, auctions |
 | **Prometheus (micrometer-registry-prometheus)** | Metrics scraping and time-series storage |
 | **Grafana** | Dashboard visualization (JVM, HTTP, custom bid metrics) |
 | **SLF4J / Logback** | Structured logging for full audit trail |
