@@ -2,6 +2,7 @@ package bid.safe.lumio.BidSafe.security;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -12,8 +13,8 @@ import java.util.Date;
 @Service
 public class JwtService {
 
-    private final String secretKey =
-            "my-super-secret-key-for-bidsafe-app-123456789";
+    @Value("${jwt.secret}")
+    private String secretKey;
 
     // Generate JWT
     public String generateToken(String email) {
